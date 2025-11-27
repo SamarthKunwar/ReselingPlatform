@@ -1,4 +1,4 @@
-package main.java.com.resell.backend.model;
+package com.resell.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
