@@ -1,6 +1,6 @@
-package main.java.com.resell.backend.repository;
+package com.resell.backend.repository;
 
-import main.java.com.resell.backend.model.User;
+import com.resell.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
