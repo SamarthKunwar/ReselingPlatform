@@ -1,7 +1,8 @@
-package main.java.com.resell.backend.service;
+package com.resell.backend.service;
 
 import com.resell.backend.model.User;
 import com.resell.backend.repository.UserRepository;
+import com.resell.backend.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;

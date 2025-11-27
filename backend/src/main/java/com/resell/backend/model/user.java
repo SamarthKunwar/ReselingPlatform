@@ -1,4 +1,4 @@
-package main.java.com.resell.backend.model;
+package com.resell.backend.model;
 import java.lang.annotation.Inherited;
 
 import jakarta.persistence.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @Noargsconstructor     
 @Allargsconstructor
 @Builder
-public class user {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

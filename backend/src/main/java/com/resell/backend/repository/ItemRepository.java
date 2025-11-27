@@ -1,7 +1,8 @@
-package main.java.com.resell.backend.repository;
-import main.java.com.resell.backend.model.User;
+package com.resell.backend.repository;
 
-import main.java.com.resell.backend.model.Item;
+import com.resell.backend.model.User;
+
+import com.resell.backend.model.Item;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
