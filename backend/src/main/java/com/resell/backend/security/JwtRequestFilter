@@ -1,0 +1,57 @@
+
+
+
+
+
+@Component
+public class JwtRequestFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain){
+
+                                        //STEP A — Read header
+                                        String authHeader = request.getHeader("Authorization");
+                                        //STEP B — Check if token exists and starts with "Bearer "
+                                        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                                            filterChain.doFilter(request, response);
+                                            return;
+                                        }
+                                        //Remove first 7 characters of "Bearer ":
+                                        String token = authHeader.substring(7);
+                                        //STEP C — Extract username from token
+                                        String username = jwtUtil.extractUsername(token);
+
+                                        //STEP C.1 — Check if user is not already authenticateD
+                                        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                                            SecurityContextHolder.getContext().getAuthentication() == null
+                                        }
+                                        //STEP D — Load user details
+                                        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                                        //STEP E — Validate token
+                                        boolean isValid = jwtUtil.validateToken(token, userDetails.getUsername());
+
+                                        boolean isValid = jwtUtil.validateToken(token, userDetails.getUsername());
+                                        if (isValid) {
+                                            //STEP F — Build authentication object
+                                            UsernamePasswordAuthenticationToken authToken =
+                                                    new UsernamePasswordAuthenticationToken(
+                                                            userDetails, null, userDetails.getAuthorities());
+
+                                            //STEP G — Set in SecurityContext
+                                            SecurityContextHolder.getContext().setAuthentication(authToken);
+                                        }
+                                        //STEP H — Continue filter chain
+                                        filterChain.doFilter(request, response);
+
+                                    }
+
+}
