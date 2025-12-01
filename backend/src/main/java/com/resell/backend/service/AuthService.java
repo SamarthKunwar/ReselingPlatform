@@ -2,7 +2,8 @@ package com.resell.backend.service;
 
 import com.resell.backend.model.User;
 import com.resell.backend.repository.UserRepository;
-import com.resell.backend.util.JwtUtil;
+import com.resell.backend.security.JwtUtil;
+
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
@@ -53,7 +54,7 @@ public class AuthService {
         }
 
         // 3. Generate JWT token
-        String token = jwtUtil.generateToken(user.getFullname());
+        String token = jwtUtil.generateToken(user.getFirstname());
 
         return token;
     }

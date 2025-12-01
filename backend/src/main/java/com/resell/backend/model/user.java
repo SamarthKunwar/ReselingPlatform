@@ -22,6 +22,9 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String fullname;
+    private String firstname;
+
+    @Column(nullable = false)
+    private String lastname;
     
 }

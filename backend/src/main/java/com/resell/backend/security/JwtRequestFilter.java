@@ -1,7 +1,19 @@
+package com.resell.backend.security;
 
+import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -15,7 +27,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain){
+                                    FilterChain filterChain) throws IOException, ServletException{
 
                                         //STEP A — Read header
                                         String authHeader = request.getHeader("Authorization");
@@ -31,14 +43,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
                                         //STEP C.1 — Check if user is not already authenticateD
                                         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                                            SecurityContextHolder.getContext().getAuthentication() == null
+                                            // STEP D — Load user details
+                                            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                                            // STEP E — Validate token
+                                            boolean isValid = jwtUtil.validateToken(token, userDetails.getUsername());
+                                            if (isValid) {
+                                                // STEP F — Build authentication object
+                                                UsernamePasswordAuthenticationToken authToken =
+                                                        new UsernamePasswordAuthenticationToken(
+                                                                userDetails, null, userDetails.getAuthorities());
+
+                                                // STEP G — Set in SecurityContext
+                                                SecurityContextHolder.getContext().setAuthentication(authToken);
+                                            }
                                         }
                                         //STEP D — Load user details
                                         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                                         //STEP E — Validate token
-                                        boolean isValid = jwtUtil.validateToken(token, userDetails.getUsername());
-
                                         boolean isValid = jwtUtil.validateToken(token, userDetails.getUsername());
                                         if (isValid) {
                                             //STEP F — Build authentication object
