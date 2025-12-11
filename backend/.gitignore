@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### jdk###
+src/main/java/com/resell/backend/security/oracleJdk-25/

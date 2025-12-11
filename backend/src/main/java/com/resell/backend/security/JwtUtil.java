@@ -1,4 +1,4 @@
-package com.resell.backend.util;
+package com.resell.backend.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;

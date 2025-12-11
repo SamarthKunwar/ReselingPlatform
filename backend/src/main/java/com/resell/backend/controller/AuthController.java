@@ -43,8 +43,7 @@ public class AuthController {
 
         // Create user object
         User user = new User();
-        user.setFirstname(request.getFirstname());
-        user.setLastname(request.getLastname());
+        user.setFullname(request.getFirstname() + " " + request.getLastname());
         user.setEmail(request.getEmail());
         user.setPassword(encodedPassword);
 
@@ -83,7 +82,7 @@ public class AuthController {
 
         // Return token + user info
         return ResponseEntity.ok(
-                new LoginResponse(token, user.getFirstname(), user.getEmail())
+                new LoginResponse(token, user.getFullname(), user.getEmail())
         );
     }
 

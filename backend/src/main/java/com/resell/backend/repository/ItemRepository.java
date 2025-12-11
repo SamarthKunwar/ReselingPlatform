@@ -1,14 +1,12 @@
 package com.resell.backend.repository;
 
-import com.resell.backend.model.User;
-
-import com.resell.backend.model.Item;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.resell.backend.model.Item;
 
 
-public interface ItemRepository extends JpaRepository<User, Long> {
-     List<Item> findByOwnerId(Long userId);
+public interface ItemRepository extends JpaRepository<Item, Long> {
+     List<Item> findByOwnerId(Long owner);
 }
