@@ -1,4 +1,5 @@
 package com.resell.backend.security;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,21 +13,21 @@ import org.springframework.stereotype.Component;
 @Component
 
 // Incoming Request from controllers
-//        |
-//        v
+// |
+// v
 // [JwtFilter]
-//        |
-//        |-- Does header exist?
-//        |-- Is it "Bearer <token>"?
-//        |
-//        |--> Extract token
-//        |--> Extract username
-//        |--> Load user details
-//        |--> Validate token
-//        |--> Build authentication object
-//        |--> Set in SecurityContext
-//        |
-//        v
+// |
+// |-- Does header exist?
+// |-- Is it "Bearer <token>"?
+// |
+// |--> Extract token
+// |--> Extract username
+// |--> Load user details
+// |--> Validate token
+// |--> Build authentication object
+// |--> Set in SecurityContext
+// |
+// v
 // Continue to Controller
 public class JwtUtil {
 
@@ -44,16 +45,12 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    
-    
     public <T> T extractClaim(String token, java.util.function.Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    
-
-   // Get all claims
+    // Get all claims
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
@@ -72,7 +69,7 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username);
     }
-    
+
     // Build the token
     private String createToken(Map<String, Object> claims, String subject) {
         long now = System.currentTimeMillis();
@@ -91,5 +88,9 @@ public class JwtUtil {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
-}
 
+    public String extractEmail(String token) {
+        return extractUsername(token);
+    }
+
+}
