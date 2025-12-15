@@ -1,7 +1,5 @@
 package com.resell.backend.model;
 
-import java.lang.annotation.Inherited;
-
 import jakarta.persistence.*;
 import lombok.*;
 

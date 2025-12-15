@@ -1,8 +1,5 @@
 package com.resell.backend.controller;
-
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,13 +8,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.resell.backend.model.Item;
 import com.resell.backend.model.User;
 import com.resell.backend.repository.ItemRepository;
 import com.resell.backend.repository.UserRepository;
 import com.resell.backend.security.JwtUtil;
 
+@RestController
+@RequestMapping("/items")
 public class ItemController {
     @Autowired
     private ItemRepository itemRepository;
@@ -43,18 +43,21 @@ public class ItemController {
     @GetMapping("/my")
     public List<Item> getMyItems(@RequestHeader("Authorization") String token) {
         String jwt = token.substring(7); // remove "Bearer "
-        String email = jwtUtil.extractEmail(jwt); // assume your JwtUtil can extract email
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isEmpty()) {
-            return List.of(); // empty list if user not found
-        }
-        User user = optionalUser.get();
-        return itemRepository.findByOwnerId(user.getId());
+        String email = jwtUtil.extractEmail(jwt);
+        return userRepository.findByEmail(email)
+                .map(user -> itemRepository.findByOwnerId(user.getId()))
+                .orElse(List.of());
     }
 
     // Add item
     @PostMapping
-    public Item addItem(@RequestBody Item item) {
+    public Item addItem(@RequestBody Item item, @RequestHeader("Authorization") String token) {
+        String jwt = token.substring(7);
+        String email = jwtUtil.extractEmail(jwt);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        item.setOwner(user);
         return itemRepository.save(item);
     }
 
