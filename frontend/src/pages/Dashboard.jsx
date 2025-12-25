@@ -70,7 +70,7 @@ const Dashboard = () => {
             <div className="max-w-6xl mx-auto">
                 {/* Header with Cart Icon */}
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold">Dashboard</h1>
+                    <h1 className="text-3xl font-bold">Vintage</h1>
                     <div className="flex items-center gap-4">
                         <span className="text-gray-400">Welcome, {username}</span>
 
@@ -93,6 +93,13 @@ const Dashboard = () => {
                             className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg transition-colors"
                         >
                             Logout
+                        </button>
+
+                        <button
+                            onClick={() => navigate('/post-item')}
+                            className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg transition-colors mr-4"
+                        >
+                            Add Item
                         </button>
                     </div>
                 </div>

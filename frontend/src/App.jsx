@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Cart from './pages/Cart';
+import PostItem from './pages/PostItem';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/post-item" element={<PostItem />} />
       </Routes>
     </Router>
   );

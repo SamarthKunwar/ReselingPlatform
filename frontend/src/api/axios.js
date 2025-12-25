@@ -43,4 +43,10 @@ export const cartAPI = {
     checkout: () => api.post('/cart/checkout')
 };
 
+export const itemAPI = {
+    // Post a new item
+    // Params: itemData { title, description, price, imageUrl }
+    createItem: (itemData) => api.post('/items', itemData)
+};
+
 export default api;
