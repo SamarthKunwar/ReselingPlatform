@@ -1,5 +1,8 @@
 package com.resell.backend.controller;
 
+import com.resell.backend.dto.CartDTO;
+import com.resell.backend.dto.CartItemDTO;
+import com.resell.backend.dto.ItemDTO;
 import com.resell.backend.model.Cart;
 import com.resell.backend.model.CartItem;
 import com.resell.backend.model.Item;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cart")
@@ -46,7 +50,25 @@ public class CartController {
                             .build();
                     return cartRepository.save(newCart);
                 });
-        return ResponseEntity.ok(cart);
+
+        // Convert to DTO to properly serialize item details
+        CartDTO cartDTO = CartDTO.builder()
+                .id(cart.getId())
+                .items(cart.getItems().stream()
+                        .map(cartItem -> CartItemDTO.builder()
+                                .id(cartItem.getId())
+                                .item(ItemDTO.builder()
+                                        .id(cartItem.getItem().getId())
+                                        .title(cartItem.getItem().getTitle())
+                                        .description(cartItem.getItem().getDescription())
+                                        .price(cartItem.getItem().getPrice())
+                                        .imageUrl(cartItem.getItem().getImageUrl())
+                                        .build())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
+
+        return ResponseEntity.ok(cartDTO);
     }
 
     // Add item to cart
