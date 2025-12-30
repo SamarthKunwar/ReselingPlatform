@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  #pods
+  template: 
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        # REPLACE with your actual image path: e.g., gcr.io/PROJECT_ID/backend:latest
+        image: backend:latest 
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        # Connect to the 'mysql' service defined in mysql-service.yaml
+        - name: DB_URL
+          value: jdbc:mysql://mysql:3306/resell
+        - name: DB_USERNAME
+          value: root
+        - name: DB_PASSWORD
+          value: rootpassword # Should match mysql-deployment.yaml
+        # Add JWT_SECRET if needed, or use default from properties
+        # - name: JWT_SECRET
+        #   value: "your-secret-key"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: LoadBalancer # Changed to LoadBalancer for easier testing if you want to hit API directly, otherwise ClusterIP
