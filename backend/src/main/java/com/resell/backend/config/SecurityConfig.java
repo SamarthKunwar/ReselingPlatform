@@ -27,15 +27,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-                .csrf(csrf -> csrf.disable()) // disable CSRF for APIs
+                // 1. CORS: Enable Cross-Origin Resource Sharing so the frontend can call us
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // 2. CSRF: Disable Cross-Site Request Forgery because we use stateless JWTs,
+                // not sessions
+                .csrf(csrf -> csrf.disable())
+
+                // 3. Authorization Rules: Define which pages are public vs private
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/auth/login", "/auth/register").permitAll() // Public access
+                        .anyRequest().authenticated()) // All other requests require login
+
+                // 4. Session Management: Make it STATELESS (Server doesn't remember users, they
+                // must send token every time)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // register JWT filter before username/password filter
+        // 5. Add our custom JWT Filter before the standard Username/Password check
+        // This checks if the user sent a valid token BEFORE trying to log them in.
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -48,21 +58,29 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Encrypt passwords
+        return new BCryptPasswordEncoder(); // Use BCrypt to securely hash passwords
     }
 
+    // Bean to define the CORS rules specifically for Spring Security
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
+        // Allow requests from these frontend URLs
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000",
-                "http://localhost", "http://localhost:80", "http://127.0.0.1", "http://127.0.0.1:80")); // Allow
-        // frontend
+                "http://localhost", "http://localhost:80", "http://127.0.0.1", "http://127.0.0.1:80"));
+
+        // Allow these HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Allow all headers (like 'Authorization', 'Content-Type')
         configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // Allow credentials (cookies, auth headers)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); // Apply to all paths
         return source;
     }
 
