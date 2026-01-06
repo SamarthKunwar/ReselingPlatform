@@ -6,8 +6,6 @@ public class RegisterRequest {
     private String firstname;
     private String lastname;
 
-   
-    
     // Getters and Setters
     public String getEmail() {
         return email;
@@ -29,10 +27,11 @@ public class RegisterRequest {
         return firstname;
     }
 
-    public void setfirstname(String firstname) {
+    public void setFirstname(String firstname) {
         this.firstname = firstname;
     }
-     public String getLastname() {
+
+    public String getLastname() {
         return lastname;
     }
 

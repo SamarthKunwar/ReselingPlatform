@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-     @Autowired
+    @Autowired
     private UserRepository userRepo;
 
     @Autowired
@@ -31,14 +31,18 @@ public class AuthController {
     // 1. register()
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
+        System.out.println("DEBUG: Register endpoint hit");
+        System.out.println("DEBUG: Email: " + request.getEmail());
+        System.out.println("DEBUG: Firstname: " + request.getFirstname());
+        System.out.println("DEBUG: Password: " + (request.getPassword() != null ? "***" : "null"));
         // Check if user with this email already exists
         if (userRepo.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity
-                .badRequest()
-                .body("Error: Email is already in use!");
+                    .badRequest()
+                    .body("Error: Email is already in use!");
         }
 
-       // Encode the password
+        // Encode the password
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         // Create user object
@@ -47,16 +51,14 @@ public class AuthController {
         user.setEmail(request.getEmail());
         user.setPassword(encodedPassword);
 
-
-          // Save to database
+        // Save to database
         userRepo.save(user);
 
         // Return success response
         return ResponseEntity.ok("User registered successfully!");
     }
 
-
-        // 2️⃣ Login endpoint
+    // 2️⃣ Login endpoint
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
 
@@ -65,9 +67,7 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
-                            request.getPassword()
-                    )
-            );
+                            request.getPassword()));
         } catch (BadCredentialsException e) {
             return ResponseEntity
                     .status(401)
@@ -82,8 +82,7 @@ public class AuthController {
 
         // Return token + user info
         return ResponseEntity.ok(
-                new LoginResponse(token, user.getFullname(), user.getEmail())
-        );
+                new LoginResponse(token, user.getFullname(), user.getEmail()));
     }
 
     // Inner class for login response
@@ -98,10 +97,16 @@ public class AuthController {
             this.email = email;
         }
 
-        public String getToken() { return token; }
-        public String getUsername() { return username; }
-        public String getEmail() { return email; }
+        public String getToken() {
+            return token;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getEmail() {
+            return email;
+        }
     }
 }
-    
-
