@@ -15,9 +15,21 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**") // Apply to all endpoints
-                .allowedOrigins("http://localhost:5173", "http://localhost:5174") // Allow these specific Frontend URLs
+                .allowedOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000") // Allow
+                                                                                                           // these
+                                                                                                           // specific
+                                                                                                           // Frontend
+                                                                                                           // URLs
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow these HTTP methods
                 .allowedHeaders("*") // Allow all headers
                 .allowCredentials(true); // Allow sending cookies/auth headers
+    }
+
+    @Override
+    public void addResourceHandlers(
+            @NonNull org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry registry) {
+        // Map access to /uploads/** to the file system directory "uploads"
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/");
     }
 }

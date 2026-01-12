@@ -4,11 +4,15 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8080:8080"
+      - "8086:8080"
     environment:
       - DB_URL=jdbc:mysql://db:3306/resell
-      - DB_USERNAME=root
-      - DB_PASSWORD=rootpassword
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPRING_CLOUD_GCP_PROJECT_ID=resellplatform
+      - GOOGLE_CLOUD_PROJECT=resellplatform
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/google_credentials.json
+    volumes:
+      - C:/Users/prath/AppData/Roaming/gcloud/application_default_credentials.json:/tmp/keys/google_credentials.json:ro
     depends_on:
       db:
         condition: service_healthy
@@ -18,7 +22,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "80:80"
+      - "8085:80"
     depends_on:
       - backend
     networks:
@@ -29,7 +33,7 @@ services:
     ports:
       - "3307:3306" # Expose on 3307 to avoid conflict with local mysql if running
     environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=resell
     volumes:
       - db-data:/var/lib/mysql

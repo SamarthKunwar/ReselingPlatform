@@ -61,7 +61,7 @@ public class AuthController {
     // 2️⃣ Login endpoint
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
+        System.out.println("DEBUG: Login endpoint hit for: " + request.getEmail());
         try {
             // Authenticate using AuthenticationManager
             authenticationManager.authenticate(

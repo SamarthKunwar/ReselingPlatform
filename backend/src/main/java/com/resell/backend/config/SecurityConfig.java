@@ -36,7 +36,7 @@ public class SecurityConfig {
 
                 // 3. Authorization Rules: Define which pages are public vs private
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register").permitAll() // Public access
+                        .requestMatchers("/auth/login", "/auth/register", "/uploads/**").permitAll() // Public access
                         .anyRequest().authenticated()) // All other requests require login
 
                 // 4. Session Management: Make it STATELESS (Server doesn't remember users, they
@@ -68,7 +68,9 @@ public class SecurityConfig {
 
         // Allow requests from these frontend URLs
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000",
-                "http://localhost", "http://localhost:80", "http://127.0.0.1", "http://127.0.0.1:80"));
+                "http://localhost", "http://localhost:80", "http://localhost:8081", "http://localhost:8085",
+                "http://127.0.0.1",
+                "http://127.0.0.1:80"));
 
         // Allow these HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

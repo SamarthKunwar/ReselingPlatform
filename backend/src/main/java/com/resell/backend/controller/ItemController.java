@@ -1,4 +1,5 @@
 package com.resell.backend.controller;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -72,6 +73,21 @@ public class ItemController {
     @DeleteMapping("/{id}")
     public void deleteItem(@PathVariable Long id) {
         itemRepository.deleteById(id);
+    }
+
+    @Autowired
+    private com.resell.backend.service.StorageService storageService;
+
+    @PostMapping("/upload")
+    public org.springframework.http.ResponseEntity<java.util.Map<String, String>> uploadFile(
+            @org.springframework.web.bind.annotation.RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            String fileUrl = storageService.uploadFile(file);
+            return org.springframework.http.ResponseEntity.ok(java.util.Map.of("url", fileUrl));
+        } catch (java.io.IOException e) {
+            return org.springframework.http.ResponseEntity.internalServerError()
+                    .body(java.util.Map.of("error", "Failed to upload file"));
+        }
     }
 
 }

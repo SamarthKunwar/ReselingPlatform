@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080', // Backend is running on 8080
+    baseURL: 'http://localhost:8086', // Backend is running on 8086
     headers: {
         'Content-Type': 'application/json',
     },
@@ -46,7 +46,20 @@ export const cartAPI = {
 export const itemAPI = {
     // Post a new item
     // Params: itemData { title, description, price, imageUrl }
-    createItem: (itemData) => api.post('/items', itemData)
+    createItem: (itemData) => api.post('/items', itemData),
+
+    // Upload an image
+    // Params: file (File object from input)
+    // Returns: { url: "..." }
+    uploadImage: (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return api.post('/items/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
 };
 
 export default api;

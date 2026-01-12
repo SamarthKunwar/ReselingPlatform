@@ -10,6 +10,7 @@ const PostItem = () => {
         price: '',
         imageUrl: ''
     });
+    const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -21,8 +22,31 @@ const PostItem = () => {
         }));
     };
 
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setUploading(true);
+        setError('');
+
+        try {
+            const response = await itemAPI.uploadImage(file);
+            const imageUrl = response.data.url;
+            setFormData(prev => ({
+                ...prev,
+                imageUrl: imageUrl
+            }));
+        } catch (err) {
+            console.error('Image upload failed:', err);
+            setError('Failed to upload image. Please try again.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (uploading) return;
         setLoading(true);
         setError('');
 
@@ -95,16 +119,43 @@ const PostItem = () => {
                     </div>
 
                     <div>
-                        <label className="block text-gray-300 mb-1 text-sm">Image URL</label>
-                        <input
-                            type="url"
-                            name="imageUrl"
-                            value={formData.imageUrl}
-                            onChange={handleChange}
-                            required
-                            className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                            placeholder="https://example.com/image.jpg"
-                        />
+                        <label className="block text-gray-300 mb-1 text-sm">Item Image</label>
+                        <div className="mt-1 flex flex-col items-center p-4 border-2 border-dashed border-gray-600 rounded-lg hover:border-blue-500 transition-colors cursor-pointer relative">
+                            {uploading ? (
+                                <div className="text-blue-400">Uploading to Cloud...</div>
+                            ) : formData.imageUrl ? (
+                                <div className="w-full text-center">
+                                    <img
+                                        src={formData.imageUrl}
+                                        alt="Preview"
+                                        className="max-h-32 mx-auto rounded mb-2 shadow-lg"
+                                    />
+                                    <p className="text-xs text-green-400 truncate">{formData.imageUrl}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
+                                        className="text-xs text-red-400 mt-2 hover:underline"
+                                    >
+                                        Remove image
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p className="text-xs text-gray-400">Click to upload image</p>
+                                </>
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                disabled={uploading}
+                            />
+                        </div>
+                        <input type="hidden" name="imageUrl" value={formData.imageUrl} required />
                     </div>
 
                     <div className="flex gap-4 pt-4">
