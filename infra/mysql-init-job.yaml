@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mysql-init
+  labels:
+    app: mysql-init
+spec:
+  template:
+    spec:
+      containers:
+      - name: mysql-init
+        image: mysql:8.0
+        env:
+        - name: MYSQL_HOST
+          value: mysql
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: DB_ROOT_PASSWORD
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: DB_USERNAME
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: DB_PASSWORD
+        command: ["sh","-c"]
+        args:
+        - |
+          # Wait for MySQL to accept connections
+          echo "Waiting for MySQL to be ready..."
+          until mysql -h "$MYSQL_HOST" -uroot -p"$MYSQL_ROOT_PASSWORD" -e 'select 1' >/dev/null 2>&1; do
+            sleep 2
+          done
+
+          # Idempotent creation of database and app user
+          mysql -h "$MYSQL_HOST" -uroot -p"$MYSQL_ROOT_PASSWORD" <<EOF
+          CREATE DATABASE IF NOT EXISTS resell;
+          CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+          ALTER USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+          GRANT ALL PRIVILEGES ON resell.* TO '${MYSQL_USER}'@'%';
+          FLUSH PRIVILEGES;
+          EOF
+      restartPolicy: OnFailure
+  backoffLimit: 3

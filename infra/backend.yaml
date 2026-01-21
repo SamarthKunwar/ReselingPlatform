@@ -3,34 +3,86 @@ kind: Deployment
 metadata:
   name: backend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: backend
-  #pods
-  template: 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  template:
     metadata:
       labels:
         app: backend
     spec:
+      serviceAccountName: backend-sa
       containers:
       - name: backend
-        # REPLACE_WITH_IMAGE_PATH
-        image: backend:latest 
-        imagePullPolicy: IfNotPresent
+        # Using Cloud Build pushed image in Artifact Registry
+        image: europe-west3-docker.pkg.dev/resellplatform/backend/backend:1a69eaf
+        # Force pulling latest image when pods are recreated so config / build changes take effect
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
-        # Connect to the 'mysql' service defined in mysql-service.yaml
-        - name: DB_URL
+        - name: SPRING_APPLICATION_NAME
+          value: backend
+
+        - name: SPRING_DATASOURCE_URL
           value: jdbc:mysql://mysql:3306/resell
-        - name: DB_USERNAME
-          value: root
-        - name: DB_PASSWORD
-          value: rootpassword # Should match mysql-deployment.yaml
-        # Add JWT_SECRET if needed, or use default from properties
-        # - name: JWT_SECRET
-        #   value: "your-secret-key"
+
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: update
+
+        - name: SPRING_JPA_SHOW_SQL
+          value: "true"
+
+        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+          value: org.hibernate.dialect.MySQLDialect
+
+        # FROM SECRET
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: DB_USERNAME
+
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: DB_PASSWORD
+        startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+        readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+        livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            failureThreshold: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"  # 0.2 CPU
+          limits:
+            memory: "1000Mi"
+            cpu: "1000m"  # 1.0 CPU      
+        
+
 ---
 apiVersion: v1
 kind: Service

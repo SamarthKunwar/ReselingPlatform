@@ -3,10 +3,15 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
   template:
     metadata:
       labels:
@@ -14,11 +19,30 @@ spec:
     spec:
       containers:
       - name: frontend
-        # REPLACE with your actual image path: e.g., gcr.io/PROJECT_ID/frontend:latest
-        image: frontend:latest
+        # Using Cloud Build pushed image in Artifact Registry
+        image: europe-west3-docker.pkg.dev/resellplatform/frontend/frontend:1a69eaf
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 20
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"  # 0.2 CPU
+          limits:
+            memory: "1000Mi"
+            cpu: "1000m"  # 1.0 CPU    
 ---
 apiVersion: v1
 kind: Service
