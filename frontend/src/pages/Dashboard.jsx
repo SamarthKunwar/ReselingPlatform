@@ -61,44 +61,59 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-black">
             {/* Header */}
-            <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+            <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 py-4">
                     <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-light tracking-tight text-gray-900">Vintage</h1>
+                        <h1 className="text-2xl font-light tracking-tight text-white">Vintage</h1>
 
                         <div className="flex items-center gap-3">
-                            <span className="text-sm text-gray-600 hidden sm:block">{username}</span>
+                            <span className="text-sm text-gray-400 hidden sm:block">{username}</span>
 
                             {/* Cart Button */}
                             <button
                                 onClick={() => navigate('/cart')}
-                                className="relative p-2.5 hover:bg-gray-100 rounded-full transition-colors group"
+                                className="relative p-2.5 hover:bg-gray-800 rounded-full transition-colors group"
                                 title="Cart"
                             >
-                                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center">
+                                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-medium rounded-full h-5 w-5 flex items-center justify-center">
                                         {cartCount}
                                     </span>
                                 )}
                             </button>
 
+                            {/* Admin Button */}
+                            {localStorage.getItem('role') === 'ROLE_ADMIN' && (
+                                <button
+                                    onClick={() => navigate('/admin')}
+                                    className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                                >
+                                    Admin
+                                </button>
+                            )}
+
                             {/* Add Item Button */}
                             <button
                                 onClick={() => navigate('/post-item')}
-                                className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                                className="px-4 py-2 bg-white text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
                             >
                                 New Item
                             </button>
 
                             {/* Logout Button */}
                             <button
-                                onClick={handleLogout}
-                                className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900 transition-colors"
+                                onClick={() => {
+                                    localStorage.removeItem('token');
+                                    localStorage.removeItem('username');
+                                    localStorage.removeItem('role');
+                                    navigate('/login');
+                                }}
+                                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
                             >
                                 Logout
                             </button>
@@ -111,14 +126,14 @@ const Dashboard = () => {
             <main className="max-w-7xl mx-auto px-6 py-12">
                 {/* Success Message */}
                 {successMessage && (
-                    <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
+                    <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-400 rounded-lg text-sm">
                         {successMessage}
                     </div>
                 )}
 
                 {/* Error Message */}
                 {error && (
-                    <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm">
+                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm">
                         {error}
                     </div>
                 )}
@@ -127,10 +142,10 @@ const Dashboard = () => {
                 {items.length === 0 ? (
                     <div className="text-center py-20">
                         <div className="text-6xl mb-4">📦</div>
-                        <p className="text-gray-500 text-lg">No items yet</p>
+                        <p className="text-gray-400 text-lg">No items yet</p>
                         <button
                             onClick={() => navigate('/post-item')}
-                            className="mt-6 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                            className="mt-6 px-6 py-3 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
                         >
                             Post Your First Item
                         </button>
@@ -140,10 +155,13 @@ const Dashboard = () => {
                         {items.map((item) => (
                             <div
                                 key={item.id}
-                                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
+                                className="group bg-gray-800/50 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-700/50 hover:border-gray-600"
                             >
-                                {/* Image */}
-                                <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                                {/* Image - Clickable */}
+                                <div
+                                    onClick={() => navigate(`/items/${item.id}`)}
+                                    className="relative aspect-square bg-gray-900 overflow-hidden cursor-pointer"
+                                >
                                     {item.imageUrl ? (
                                         <img
                                             src={item.imageUrl}
@@ -151,7 +169,7 @@ const Dashboard = () => {
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             onError={(e) => {
                                                 e.target.onerror = null;
-                                                e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23F3F4F6" width="100" height="100"/%3E%3Ctext fill="%239CA3AF" font-family="sans-serif" font-size="12" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
+                                                e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%231F2937" width="100" height="100"/%3E%3Ctext fill="%236B7280" font-family="sans-serif" font-size="12" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
                                             }}
                                         />
                                     ) : (
@@ -163,16 +181,24 @@ const Dashboard = () => {
 
                                 {/* Content */}
                                 <div className="p-5">
-                                    <h3 className="font-medium text-gray-900 mb-1 line-clamp-1">{item.title}</h3>
-                                    <p className="text-sm text-gray-500 mb-3 line-clamp-2">{item.description}</p>
+                                    <h3
+                                        onClick={() => navigate(`/items/${item.id}`)}
+                                        className="font-medium text-white mb-1 line-clamp-1 cursor-pointer hover:text-gray-300 transition-colors"
+                                    >
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">{item.description}</p>
 
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xl font-semibold text-gray-900">${item.price}</span>
+                                        <span className="text-xl font-semibold text-white">${item.price}</span>
 
                                         <button
-                                            onClick={() => handleAddToCart(item.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddToCart(item.id);
+                                            }}
                                             disabled={addingToCart === item.id}
-                                            className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="px-4 py-2 bg-white text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {addingToCart === item.id ? '...' : 'Add'}
                                         </button>

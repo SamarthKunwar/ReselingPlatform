@@ -21,8 +21,7 @@ spec:
       containers:
       - name: backend
         # Using Cloud Build pushed image in Artifact Registry
-        image: europe-west3-docker.pkg.dev/resellplatform/backend/backend:1a69eaf
-        # Force pulling latest image when pods are recreated so config / build changes take effect
+        image: europe-west3-docker.pkg.dev/resellplatform/backend/backend:18a5745
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -41,7 +40,9 @@ spec:
 
         - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
           value: org.hibernate.dialect.MySQLDialect
-
+        
+        - name: INITIAL_ADMIN_EMAIL
+          value: "samarthkunwar2002@gmail.com"
         # FROM SECRET
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
@@ -54,6 +55,12 @@ spec:
             secretKeyRef:
               name: backend-secrets
               key: DB_PASSWORD
+        
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: JWT_SECRET
         startupProbe:
             httpGet:
               path: /actuator/health
@@ -77,7 +84,7 @@ spec:
         resources:
           requests:
             memory: "256Mi"
-            cpu: "200m"  # 0.2 CPU
+            cpu: "100m"  # 0.1 CPU
           limits:
             memory: "1000Mi"
             cpu: "1000m"  # 1.0 CPU      

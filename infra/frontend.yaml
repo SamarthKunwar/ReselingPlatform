@@ -20,7 +20,7 @@ spec:
       containers:
       - name: frontend
         # Using Cloud Build pushed image in Artifact Registry
-        image: europe-west3-docker.pkg.dev/resellplatform/frontend/frontend:1a69eaf
+        image: europe-west3-docker.pkg.dev/resellplatform/frontend/frontend:18a5745
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

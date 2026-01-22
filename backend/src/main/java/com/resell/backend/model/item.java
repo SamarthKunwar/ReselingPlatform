@@ -1,4 +1,5 @@
 package com.resell.backend.model;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,4 +23,7 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
+
+    @Builder.Default
+    private Boolean purchased = false;
 }

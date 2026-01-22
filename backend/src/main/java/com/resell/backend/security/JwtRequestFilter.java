@@ -60,7 +60,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             // Log the error but allows the request to continue (e.g., to public endpoints)
-            // System.out.println("JWT Validation failed: " + e.getMessage());
+            System.out.println("DEBUG: JWT Validation failed: " + e.getMessage());
             SecurityContextHolder.clearContext();
         }
 

@@ -12,13 +12,14 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await api.post('/auth/login', { email, password });
-            const { token, username } = response.data;
+            const { token, username, role } = response.data;
 
             // Store token and user info
             localStorage.setItem('token', token);
             localStorage.setItem('username', username);
+            localStorage.setItem('role', role);
 
-            navigate('/dashboard'); // We will create this later
+            navigate('/dashboard');
         } catch (err) {
             setError('Invalid email or password');
         }

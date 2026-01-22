@@ -120,15 +120,37 @@ const Cart = () => {
 
                             <div className="space-y-4">
                                 {cart.items.map((cartItem) => (
+
                                     <div
                                         key={cartItem.id}
-                                        className="bg-gray-700/50 p-4 rounded-lg border border-gray-600 flex justify-between items-center hover:border-gray-500 transition-colors"
+                                        className="bg-gray-700/50 p-4 rounded-lg border border-gray-600 flex gap-4 items-center hover:border-gray-500 transition-colors"
                                     >
+                                        {/* Item Image */}
+                                        <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800">
+                                            {cartItem.item?.imageUrl ? (
+                                                <img
+                                                    src={cartItem.item.imageUrl}
+                                                    alt={cartItem.item.title}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src =
+                                                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%231F2937" width="100" height="100"/%3E%3Ctext fill="%236B7280" font-family="sans-serif" font-size="14" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-2xl opacity-30">
+                                                    📦
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Item Details */}
                                         <div className="flex-1">
                                             <h3 className="font-bold text-lg text-white mb-1">
                                                 {cartItem.item?.title || 'Unknown Item'}
                                             </h3>
-                                            <p className="text-gray-300 text-sm mb-2">
+                                            <p className="text-gray-300 text-sm mb-2 line-clamp-2">
                                                 {cartItem.item?.description || 'No description'}
                                             </p>
                                             <p className="text-blue-400 font-bold text-lg">
@@ -136,13 +158,15 @@ const Cart = () => {
                                             </p>
                                         </div>
 
+                                        {/* Remove Button */}
                                         <button
                                             onClick={() => handleRemoveItem(cartItem.id)}
-                                            className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg transition-colors ml-4 font-medium"
+                                            className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg transition-colors font-medium"
                                         >
                                             Remove
                                         </button>
                                     </div>
+
                                 ))}
                             </div>
                         </div>

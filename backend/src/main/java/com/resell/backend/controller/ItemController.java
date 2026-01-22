@@ -32,7 +32,7 @@ public class ItemController {
     // Get all items
     @GetMapping
     public List<Item> getAllItems() {
-        return itemRepository.findAll();
+        return itemRepository.findByPurchasedFalse();
     }
 
     // Get item by id
@@ -59,6 +59,9 @@ public class ItemController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         item.setOwner(user);
+        if (item.getPurchased() == null) {
+            item.setPurchased(false);
+        }
         return itemRepository.save(item);
     }
 

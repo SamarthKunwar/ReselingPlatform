@@ -8,6 +8,9 @@ WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 
+# Ensure the Maven wrapper is executable (fixes Cloud Build permission errors)
+RUN chmod +x ./mvnw
+
 # 4. Download all dependencies (this is cached so it's fast on repeated builds)
 RUN ./mvnw dependency:go-offline
 
@@ -21,7 +24,7 @@ RUN ./mvnw clean package -DskipTests
 # --- Stage 2: The final lightweight runner ---
 
     
-# 7. Start a new, smaller image with just the JRE (ignoring the heavy build tools)
+# 7. Start a new, smaller image wit h just the JRE (ignoring the heavy build tools)
 FROM eclipse-temurin:17-jre-jammy
 
 # 8. Set work dir

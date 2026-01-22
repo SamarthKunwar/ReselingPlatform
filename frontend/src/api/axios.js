@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8086', // Backend is running on 8086
+    // Use relative path so Nginx can proxy /api/ to the backend service inside the cluster
+    baseURL: '/api',
     headers: {
         'Content-Type': 'application/json',
     },

@@ -82,7 +82,7 @@ public class AuthController {
 
         // Return token + user info
         return ResponseEntity.ok(
-                new LoginResponse(token, user.getFullname(), user.getEmail()));
+                new LoginResponse(token, user.getFullname(), user.getEmail(), user.getRole()));
     }
 
     // Inner class for login response
@@ -90,11 +90,13 @@ public class AuthController {
         private String token;
         private String username;
         private String email;
+        private String role;
 
-        public LoginResponse(String token, String username, String email) {
+        public LoginResponse(String token, String username, String email, String role) {
             this.token = token;
             this.username = username;
             this.email = email;
+            this.role = role;
         }
 
         public String getToken() {
@@ -107,6 +109,10 @@ public class AuthController {
 
         public String getEmail() {
             return email;
+        }
+
+        public String getRole() {
+            return role;
         }
     }
 }

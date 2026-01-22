@@ -1,2 +1,39 @@
+# Environment variables
 .env
-backend/src/main/resources/application-local.properties
+*.env
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.tar.gz
+.project
+.classpath
+.settings/
+.mvn/wrapper/maven-wrapper.jar
+application-local.properties
+
+# Node.js / Vite
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+
+# Infrastructure / Secrets
+infra/backend-secrets.yaml
+application_default_credentials.json
+*.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Brain artifacts (internal)
+.gemini/
+brain/

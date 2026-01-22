@@ -23,4 +23,12 @@ public class User {
     @Column(nullable = false)
     private String fullname;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private String role = "ROLE_USER";
+
+    public String getRole() {
+        return role == null ? "ROLE_USER" : role;
+    }
+
 }

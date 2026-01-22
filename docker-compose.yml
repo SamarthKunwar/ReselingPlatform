@@ -1,53 +1,146 @@
+# Docker Compose configuration for the Reselling Platform
+# This file defines and orchestrates three services: backend, frontend, and database
+
 version: '3.8'
 
 services:
+  # ============================================================================
+  # BACKEND SERVICE (Spring Boot Application)
+  # ============================================================================
   backend:
+    # Build the backend Docker image from the ./backend directory
+    # Uses the Dockerfile located in ./backend/Dockerfile
     build: ./backend
+
+    # Port mapping: host:container
+    # Maps port 8086 on your machine to port 8080 inside the container
+    # Access the backend API at: http://localhost:8086
     ports:
       - "8086:8080"
+
+    # Environment variables passed to the Spring Boot application
+    # These override the default values in application.properties
     environment:
+      # Database connection URL - points to the 'db' service (not localhost!)
+      # Docker Compose creates a network where services can reach each other by name
       - DB_URL=jdbc:mysql://db:3306/resell
+
+      # Database password - reads from your environment variable
+      # Set this before running: $env:DB_PASSWORD="yourpassword"
       - DB_PASSWORD=${DB_PASSWORD}
+
+      # Google Cloud Project configuration for GCP services
       - SPRING_CLOUD_GCP_PROJECT_ID=resellplatform
       - GOOGLE_CLOUD_PROJECT=resellplatform
+
+      # Path to Google Cloud credentials file inside the container
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/google_credentials.json
+
+      # Bootstrap Admin Email - used to automatically grant admin rights
+      - INITIAL_ADMIN_EMAIL=${INITIAL_ADMIN_EMAIL}
+
+    # Volume mounting: maps files from your machine into the container
+    # This makes your GCP credentials available to the backend service
+    # Format: host_path:container_path:read_only
     volumes:
-      - C:/Users/prath/AppData/Roaming/gcloud/application_default_credentials.json:/tmp/keys/google_credentials.json:ro
+      - ${GOOGLE_CREDENTIALS_PATH:-./gcp-key.json}:/tmp/keys/google_credentials.json:ro
+
+    # Service dependencies - backend waits for database to be healthy before starting
+    # This prevents connection errors during startup
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_healthy # Waits for MySQL health check to pass
+
+    # Connect to the custom network (allows services to communicate)
     networks:
       - app-network
 
+  # ============================================================================
+  # FRONTEND SERVICE (React Application)
+  # ============================================================================
   frontend:
+    # Build the frontend Docker image from the ./frontend directory
+    # Uses the Dockerfile located in ./frontend/Dockerfile
     build: ./frontend
+
+    # Port mapping: host:container
+    # Maps port 8085 on your machine to port 80 inside the container (nginx)
+    # Access the frontend at: http://localhost:8085
     ports:
       - "8085:80"
+
+    # Frontend depends on backend being started first
+    # Note: This doesn't wait for backend to be "ready", just started
     depends_on:
       - backend
+
+    # Connect to the custom network
     networks:
       - app-network
 
+  # ============================================================================
+  # DATABASE SERVICE (MySQL 8.0)
+  # ============================================================================
   db:
+    # Use the official MySQL 8.0 image from Docker Hub
+    # No build needed - pulls pre-built image
     image: mysql:8.0
+
+    # Port mapping: host:container
+    # Maps port 3307 on your machine to port 3306 inside the container
+    # Using 3307 to avoid conflicts if you have MySQL installed locally
+    # Connect from your machine: localhost:3307
     ports:
-      - "3307:3306" # Expose on 3307 to avoid conflict with local mysql if running
+      - "3307:3306"
+
+    # Environment variables for MySQL initialization
     environment:
+      # Root user password - reads from your environment variable
+      # Set this before running: $env:MYSQL_ROOT_PASSWORD="rootpassword"
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+      # Automatically creates a database named 'resell' on first startup
       - MYSQL_DATABASE=resell
+
+    # Volume mounting for data persistence
+    # Stores MySQL data files in a named volume (survives container restarts)
+    # Without this, all data would be lost when the container stops
     volumes:
       - db-data:/var/lib/mysql
+
+    # Connect to the custom network
     networks:
       - app-network
+
+    # Health check - Docker periodically runs this command to verify MySQL is ready
+    # Other services can wait for this to pass before starting
     healthcheck:
+      # Command: ping MySQL server to check if it's responding
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+
+      # Run health check every 10 seconds
       interval: 10s
+
+      # Wait up to 5 seconds for each health check to complete
       timeout: 5s
+
+      # Retry up to 5 times before marking as unhealthy
       retries: 5
 
+# ============================================================================
+# NETWORKS
+# ============================================================================
+# Custom bridge network that allows all services to communicate with each other
+# Services can reach each other using their service names (e.g., 'db', 'backend')
 networks:
   app-network:
     driver: bridge
 
+# ============================================================================
+# VOLUMES
+# ============================================================================
+# Named volume for MySQL data persistence
+# Data stored here survives container restarts and removals
+# To delete: docker-compose down -v (WARNING: deletes all data!)
 volumes:
   db-data:

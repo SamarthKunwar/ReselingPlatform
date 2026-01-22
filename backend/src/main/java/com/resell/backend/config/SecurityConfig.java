@@ -36,7 +36,10 @@ public class SecurityConfig {
 
                 // 3. Authorization Rules: Define which pages are public vs private
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register", "/uploads/**").permitAll() // Public access
+                        .requestMatchers("/auth/login", "/auth/register", "/uploads/**", "/actuator/health",
+                                "/actuator/info")
+                        .permitAll() // Public access
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Admin only
                         .anyRequest().authenticated()) // All other requests require login
 
                 // 4. Session Management: Make it STATELESS (Server doesn't remember users, they
