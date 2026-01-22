@@ -2,6 +2,11 @@
 
 A full-stack cloud-native reselling platform built with Spring Boot and React, designed to be scalable and containerized.
 
+## 👥 Author
+
+- **Samarth Kunwar**
+-**Matriculation Number-890849**
+
 ## 🚀 Features
 
 - **User Authentication**: Secure registration and login using JWT.
@@ -165,3 +170,5 @@ This project adheres to the 12-Factor App methodology:
 - **Build, Release, Run**: Separation of build and run stages via Docker.
 - **Port Binding**: Services export HTTP on specified ports.
 - **Dev/Prod Parity**: Docker ensures consistent environments.
+
+
