@@ -21,7 +21,9 @@ steps:
       - 'build'
       - '-t'
       - 'europe-west3-docker.pkg.dev/resellplatform/frontend/frontend:$SHORT_SHA'
-      - './frontend'
+      - '-f'
+      - 'frontend/Dockerfile'   # explicit Dockerfile
+      - 'frontend'              # build context
     id: 'build-frontend'
 
   # Step 4: Push frontend image with commit SHA tag

@@ -25,7 +25,7 @@ dist-ssr/
 # Infrastructure / Secrets
 infra/backend-secrets.yaml
 application_default_credentials.json
-*.json
+gcp-key.json
 
 # IDEs
 .vscode/

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
@@ -38,11 +38,11 @@ spec:
           periodSeconds: 20
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "200m"  # 0.2 CPU
+            cpu: "50m"
+            memory: "128Mi"
           limits:
-            memory: "1000Mi"
-            cpu: "1000m"  # 1.0 CPU    
+            cpu: "200m"
+            memory: "256Mi"
 ---
 apiVersion: v1
 kind: Service

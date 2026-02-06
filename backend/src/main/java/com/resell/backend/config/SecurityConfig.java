@@ -34,7 +34,7 @@ public class SecurityConfig {
                 // not sessions
                 .csrf(csrf -> csrf.disable())
 
-                // 3. Authorization Rules: Define which pages are public vs private
+                // 3. pages public vs private
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/register", "/uploads/**", "/actuator/health",
                                 "/actuator/info")
@@ -70,10 +70,16 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Allow requests from these frontend URLs
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000",
-                "http://localhost", "http://localhost:80", "http://localhost:8081", "http://localhost:8085",
-                "http://127.0.0.1",
-                "http://127.0.0.1:80"));
+        // For production: Allow all origins since frontend IP is dynamic
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+
+        // For local development only (comment out the line above and use these):
+        // configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173",
+        // "http://localhost:3000",
+        // "http://localhost", "http://localhost:80", "http://localhost:8081",
+        // "http://localhost:8085",
+        // "http://127.0.0.1",
+        // "http://127.0.0.1:80"));
 
         // Allow these HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
