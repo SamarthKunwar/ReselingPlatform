@@ -271,35 +271,6 @@ kubectl get svc frontend
 
 ---
 
-## 🔄 Quick Restart Guide (For Tomorrow)
-
-If you need to restart everything from scratch:
-
-```powershell
-# 1. Set project
-gcloud config set project resellplatform
-
-# 2. Connect to cluster
-gcloud container clusters get-credentials resell-cluster --zone=europe-west3-a
-
-# 3. Check cluster status
-kubectl get all
-
-# 4. If cluster doesn't exist, recreate from Step 6 above
-# If cluster exists but pods are down, restart deployments:
-kubectl rollout restart deployment/mysql
-kubectl rollout restart deployment/backend
-kubectl rollout restart deployment/frontend
-
-# 5. Verify all pods are running
-kubectl get pods
-
-# 6. Check backend logs
-kubectl logs -l app=backend --tail=100
-```
-
----
-
 ## 🛠️ Troubleshooting Commands
 
 ```powershell
